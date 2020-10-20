@@ -9,8 +9,8 @@ Step 3:
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step3.png)
 Step 4:
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step4.png)
-Step 5:
-![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step5.png)
+Step 5:  
+![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step5.png)  
 Step 6:
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step6.png)
 Step 7:
@@ -33,7 +33,7 @@ Step 15:
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step15.png)
 Step 16:
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step16.png)
-Step 17:
+Step 17:  
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step17.png)
 Step 18:
 ![image](https://github.com/anthonyzng/ABAP_SAMPLE_SMARTFORMS_PROGRAM/blob/master/img/step18.png)
