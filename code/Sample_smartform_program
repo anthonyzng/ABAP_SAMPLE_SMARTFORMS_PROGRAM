@@ -1,0 +1,88 @@
+*&---------------------------------------------------------------------*
+*& Report ZSFP_TEST
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+*/1BCDWB/SF00000001
+REPORT ZSFP_TEST.
+************************************************************************
+*                  T A B L E S                                         *
+************************************************************************
+TABLES: T001.
+************************************************************************
+*                  I N T E R N A L       T A B L E                     *
+************************************************************************
+DATA : it_t001 TYPE TABLE OF T001.
+************************************************************************
+*                  W O R K               A R E A                       *
+************************************************************************
+DATA : wa_t001 TYPE T001.
+************************************************************************
+*                  V A R I A B L E                                     *
+************************************************************************
+DATA : new_str TYPE string.
+
+************************************************************************
+*                  S T A R T  O F  S E L E C T I O N                   *
+************************************************************************
+START-OF-SELECTION.
+
+*fill some data into it_t001
+PERFORM fill_data.
+PERFORM change_data.
+new_str = 'Sample smartforms & program '.
+
+CALL FUNCTION '/1BCDWB/SF00000001'
+  EXPORTING
+*   ARCHIVE_INDEX              =
+*   ARCHIVE_INDEX_TAB          =
+*   ARCHIVE_PARAMETERS         =
+*   CONTROL_PARAMETERS         =
+*   MAIL_APPL_OBJ              =
+*   MAIL_RECIPIENT             =
+*   MAIL_SENDER                =
+*   OUTPUT_OPTIONS             =
+*   USER_SETTINGS              = 'X'
+    NEW_STR                    = new_str
+* IMPORTING
+*   DOCUMENT_OUTPUT_INFO       =
+*   JOB_OUTPUT_INFO            =
+*   JOB_OUTPUT_OPTIONS         =
+  TABLES
+    IT_T001                    = it_t001
+* EXCEPTIONS
+*   FORMATTING_ERROR           = 1
+*   INTERNAL_ERROR             = 2
+*   SEND_ERROR                 = 3
+*   USER_CANCELED              = 4
+*   OTHERS                     = 5
+          .
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+
+
+FORM fill_data .
+    wa_t001-BUKRS = 'NEWC'.
+    wa_t001-BUTXT = 'NEW COMPANY'.
+    wa_t001-ORT01 = 'NEW COMPANY CITY'.
+    wa_t001-LAND1 = 'NEW COMPANY CONUTRY'.
+    APPEND wa_t001 to it_t001.
+    clear wa_t001.
+ENDFORM .
+
+FORM change_data.
+    FIELD-SYMBOLS <wa> TYPE T001.
+    LOOP AT IT_T001 ASSIGNING <wa>.
+    <wa>-BUKRS ='TEST'.
+    <wa>-BUTXT = 'TEST COMPANY'.
+    <wa>-ORT01 = 'TEST COMPANY CITY'.
+    <wa>-LAND1 = 'TEST COMPANY CONUTRY'.
+    ENDLOOP.
+
+ENDFORM.
+
+FORM data_from_db.
+      SELECT * FROM T001 into TABLE it_t001.
+ENDFORM.

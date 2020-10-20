@@ -1,0 +1,185 @@
+*&---------------------------------------------------------------------*
+*& Report ZSFP_TEST
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+*/1BCDWB/SF00000001
+REPORT ZSFP_TEST.
+************************************************************************
+*                  T A B L E S                                         *
+************************************************************************
+TABLES: T001.
+************************************************************************
+*                  I N T E R N A L       T A B L E                     *
+************************************************************************
+DATA : it_t001 TYPE TABLE OF T001.
+************************************************************************
+*                  W O R K               A R E A                       *
+************************************************************************
+DATA : wa_t001 TYPE T001.
+************************************************************************
+*                  V A R I A B L E                                     *
+************************************************************************
+DATA : new_str TYPE string.
+************************************************************************
+*                  S T A R T  O F  S E L E C T I O N                   *
+************************************************************************
+START-OF-SELECTION.
+
+*fill some data into it_t001
+PERFORM fill_data.
+PERFORM change_data.
+new_str = 'Sample smartforms & program - muit-print'.
+
+PERFORM print_muit_page.
+
+
+
+
+
+
+FORM fill_data .
+    wa_t001-BUKRS = 'NEWC'.
+    wa_t001-BUTXT = 'NEW COMPANY'.
+    wa_t001-ORT01 = 'NEW COMPANY CITY'.
+    wa_t001-LAND1 = 'NEW COMPANY CONUTRY'.
+    APPEND wa_t001 to it_t001.
+    clear wa_t001.
+ENDFORM .
+
+FORM change_data.
+    FIELD-SYMBOLS <wa> TYPE T001.
+    LOOP AT IT_T001 ASSIGNING <wa>.
+    <wa>-BUKRS ='TEST'.
+    <wa>-BUTXT = 'TEST COMPANY'.
+    <wa>-ORT01 = 'TEST COMPANY CITY'.
+    <wa>-LAND1 = 'TEST COMPANY CONUTRY'.
+    ENDLOOP.
+
+ENDFORM.
+
+FORM data_from_db.
+      SELECT * FROM T001 into TABLE it_t001.
+ENDFORM.
+
+FORM print_muit_page.
+
+  DATA: lw_control     TYPE ssfctrlop.
+  DATA: lw_options     TYPE ssfcompop.
+  DATA: gc_ldest   TYPE rspopname.     "Output device
+  DATA: lv_fmnam TYPE rs38l_fnam,
+        lv_sfnam TYPE tdsfname.
+
+  lw_control-no_dialog = abap_true.
+  lw_control-preview   = abap_true.
+  lw_control-langu     = sy-langu .
+  lw_options-tdimmed   = abap_true.
+  lw_options-tdnewid   = abap_true.
+  lw_control-no_open   = abap_true.
+  lw_control-no_close  = abap_true.
+
+
+  IF gc_ldest IS INITIAL .
+    lw_options-tddest    = 'LP01'.
+  ELSE.
+    lw_options-tddest    = gc_ldest.
+  ENDIF.
+
+    lv_sfnam = 'ZSF_TEST'.  "smartforms name
+
+  CALL FUNCTION 'SSF_FUNCTION_MODULE_NAME'
+    EXPORTING
+      formname           = lv_sfnam
+    IMPORTING
+      fm_name            = lv_fmnam
+    EXCEPTIONS
+      no_form            = 1
+      no_function_module = 2
+      OTHERS             = 3.
+
+
+
+    CALL FUNCTION 'SSF_OPEN'
+    EXPORTING
+      control_parameters = lw_control
+      output_options     = lw_options
+    EXCEPTIONS
+      formatting_error   = 1
+      internal_error     = 2
+      send_error         = 3
+      user_canceled      = 4
+      OTHERS             = 5.
+
+DO 5 TIMES.
+
+    CALL FUNCTION lv_fmnam
+      EXPORTING
+*       ARCHIVE_INDEX              =
+*       ARCHIVE_INDEX_TAB          =
+*       ARCHIVE_PARAMETERS         =
+       CONTROL_PARAMETERS         = lw_control
+*       MAIL_APPL_OBJ              =
+*       MAIL_RECIPIENT             =
+*       MAIL_SENDER                =
+       OUTPUT_OPTIONS             = lw_options
+*       USER_SETTINGS              = 'X'
+        NEW_STR                    = new_str
+*     IMPORTING
+*       DOCUMENT_OUTPUT_INFO       =
+*       JOB_OUTPUT_INFO            =
+*       JOB_OUTPUT_OPTIONS         =
+      TABLES
+        IT_T001                    = it_t001
+*     EXCEPTIONS
+*       FORMATTING_ERROR           = 1
+*       INTERNAL_ERROR             = 2
+*       SEND_ERROR                 = 3
+*       USER_CANCELED              = 4
+*       OTHERS                     = 5
+              .
+    IF SY-SUBRC <> 0.
+*     Implement suitable error handling here
+    ENDIF.
+
+ENDDO.
+
+  CALL FUNCTION 'SSF_CLOSE'
+    EXCEPTIONS
+      formatting_error = 1
+      internal_error   = 2
+      send_error       = 3
+      OTHERS           = 4.
+
+
+ENDFORM.
+
+FORM single_print.
+CALL FUNCTION '/1BCDWB/SF00000001'
+  EXPORTING
+*   ARCHIVE_INDEX              =
+*   ARCHIVE_INDEX_TAB          =
+*   ARCHIVE_PARAMETERS         =
+*   CONTROL_PARAMETERS         =
+*   MAIL_APPL_OBJ              =
+*   MAIL_RECIPIENT             =
+*   MAIL_SENDER                =
+*   OUTPUT_OPTIONS             =
+*   USER_SETTINGS              = 'X'
+    NEW_STR                    = new_str
+* IMPORTING
+*   DOCUMENT_OUTPUT_INFO       =
+*   JOB_OUTPUT_INFO            =
+*   JOB_OUTPUT_OPTIONS         =
+  TABLES
+    IT_T001                    = it_t001
+* EXCEPTIONS
+*   FORMATTING_ERROR           = 1
+*   INTERNAL_ERROR             = 2
+*   SEND_ERROR                 = 3
+*   USER_CANCELED              = 4
+*   OTHERS                     = 5
+          .
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ENDIF.
+ENDFORM.
